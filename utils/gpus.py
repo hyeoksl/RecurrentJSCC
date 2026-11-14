@@ -1,9 +1,7 @@
 import torch
 
-__all__ = ["getUsableGPUs"]
 
-
-def getUsableGPUs():
+def pick_gpu() -> int | None:
     """Return the visible CUDA device with the most free memory, if any."""
     if not torch.cuda.is_available():
         return None

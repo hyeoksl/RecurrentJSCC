@@ -1,5 +1,8 @@
 # custom
-*/logs/*
+logs/
+artifacts/
+incoming/
+reconstruction.png
 *logging.log
 *.pth.tar
 built.txt

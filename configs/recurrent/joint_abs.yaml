@@ -1,0 +1,62 @@
+# A2: shared core, joint depth training, FiLM absolute (t / K_max)
+experiment_name: joint_abs
+
+seed: 1030
+loss_type: MSE
+epochs: 500
+clip_max_norm: 1.0
+
+model:
+  type: RecurrentJSCC
+  min_SNRdB: 0
+  max_SNRdB: 20
+  spp: 0.5
+  min_spp: 0.1
+  dim: 96            # stage 1 (H/4); the core at H/8 uses 2 * dim
+  stage_blocks: 3    # N1, unshared ConvNeXt blocks per stage
+  core_blocks: 3
+  iters: [1, 2, 4, 6]
+  film: absolute
+  share_core: true
+  norm: layernorm2d
+  act: gelu
+  grn: false
+
+train:
+  iters: null
+  amp: false
+  channels_last: false
+
+valid:
+  snr: 10
+  spp: 0.5
+
+optimizer:
+  type: Adam
+  learning_rate: 1e-4
+  lr_milestone_epoch: []
+  lr_gamma: 0.1
+
+dataset:
+  train_dataset: ~/datasets/DIV2K/train
+  valid_dataset: ~/datasets/DIV2K/valid
+  train_batch_size: 8
+  valid_batch_size: 16
+  num_workers: 16
+  crop_size: 256
+  valid_crop_size: 512
+  train_resize: [640, 1200]
+
+eval:
+  dataset: ~/datasets/Kodak
+  snrs: [0, 5, 10, 15, 20]
+  spps: [0.1, 0.2, 0.3, 0.4, 0.5]
+  repeats: 3
+  seed: 0
+  flops_resolution: [256, 256]
+
+logging:
+  save_dir: logs/
+  save_model: true
+  save_every: 50
+  pretrain_ckpt: null
