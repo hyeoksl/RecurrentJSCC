@@ -242,10 +242,10 @@ def main() -> None:
     source.add_argument("--run", action="store_true")
     source.add_argument("--server-ref", action="store_true")
     parser.add_argument("--label", help="results subdirectory (default: date of the run)")
-    parser.add_argument("bench_args", nargs=argparse.REMAINDER, help="after --, passed to bench/run_all.py")
+    parser.add_argument("--bench-args", default="", help="extra arguments for bench/run_all.py, as one string")
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s;%(levelname)s;%(message)s")
-    extra = [arg for arg in args.bench_args if arg != "--"]
+    extra = shlex.split(args.bench_args)
 
     raw_root = ROOT / "artifacts" / "npu_raw" / args.bundle
     results_root = ROOT / "results" / "npu" / args.bundle

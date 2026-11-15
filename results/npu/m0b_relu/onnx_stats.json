@@ -1,0 +1,411 @@
+{
+ "name": "m0b_relu",
+ "onnxruntime": "1.23.2",
+ "per_channel": false,
+ "models": {
+  "fp32/encoder_k1.onnx": {
+   "file_bytes": 5058440,
+   "num_nodes": 129,
+   "ops": {
+    "Add": 21,
+    "Concat": 2,
+    "Constant": 13,
+    "Conv": 25,
+    "Div": 6,
+    "Identity": 8,
+    "Mul": 17,
+    "ReduceMean": 14,
+    "Relu": 8,
+    "Reshape": 1,
+    "Sigmoid": 2,
+    "Sqrt": 6,
+    "Sub": 6
+   },
+   "num_initializers": 54,
+   "initializer_bytes": 5027488,
+   "unique_initializer_bytes": 5027488,
+   "duplicated_initializer_bytes": 0,
+   "initializers_used_by_several_nodes": 4,
+   "max_uses_of_one_initializer": 3
+  },
+  "a8/encoder_k1.onnx": {
+   "file_bytes": 1427446,
+   "num_nodes": 417,
+   "ops": {
+    "Add": 21,
+    "Concat": 2,
+    "Constant": 13,
+    "Conv": 25,
+    "DequantizeLinear": 175,
+    "Div": 6,
+    "Identity": 8,
+    "Mul": 17,
+    "QuantizeLinear": 121,
+    "ReduceMean": 14,
+    "Reshape": 1,
+    "Sigmoid": 2,
+    "Sqrt": 6,
+    "Sub": 6
+   },
+   "num_initializers": 404,
+   "initializer_bytes": 1275402,
+   "unique_initializer_bytes": 1275030,
+   "duplicated_initializer_bytes": 372,
+   "initializers_used_by_several_nodes": 242,
+   "max_uses_of_one_initializer": 2,
+   "rms_error_vs_fp32_one_sample": 0.010786304250359535
+  },
+  "a16/encoder_k1.onnx": {
+   "file_bytes": 1432575,
+   "num_nodes": 417,
+   "ops": {
+    "Add": 21,
+    "Concat": 2,
+    "Constant": 13,
+    "Conv": 25,
+    "DequantizeLinear": 175,
+    "Div": 6,
+    "Identity": 8,
+    "Mul": 17,
+    "QuantizeLinear": 121,
+    "ReduceMean": 14,
+    "Reshape": 1,
+    "Sigmoid": 2,
+    "Sqrt": 6,
+    "Sub": 6
+   },
+   "num_initializers": 404,
+   "initializer_bytes": 1276103,
+   "unique_initializer_bytes": 1275662,
+   "duplicated_initializer_bytes": 441,
+   "initializers_used_by_several_nodes": 242,
+   "max_uses_of_one_initializer": 2,
+   "rms_error_vs_fp32_one_sample": 0.0011683064512908459
+  },
+  "fp32/encoder_k6.onnx": {
+   "file_bytes": 5138945,
+   "num_nodes": 414,
+   "ops": {
+    "Add": 81,
+    "Concat": 2,
+    "Constant": 58,
+    "Conv": 70,
+    "Div": 21,
+    "Identity": 8,
+    "Mul": 62,
+    "ReduceMean": 44,
+    "Relu": 23,
+    "Reshape": 1,
+    "Sigmoid": 2,
+    "Sqrt": 21,
+    "Sub": 21
+   },
+   "num_initializers": 54,
+   "initializer_bytes": 5027488,
+   "unique_initializer_bytes": 5027488,
+   "duplicated_initializer_bytes": 0,
+   "initializers_used_by_several_nodes": 22,
+   "max_uses_of_one_initializer": 8
+  },
+  "a8/encoder_k6.onnx": {
+   "file_bytes": 1847699,
+   "num_nodes": 1272,
+   "ops": {
+    "Add": 81,
+    "Concat": 2,
+    "Constant": 58,
+    "Conv": 70,
+    "DequantizeLinear": 490,
+    "Div": 21,
+    "Identity": 8,
+    "Mul": 62,
+    "QuantizeLinear": 391,
+    "ReduceMean": 44,
+    "Reshape": 1,
+    "Sigmoid": 2,
+    "Sqrt": 21,
+    "Sub": 21
+   },
+   "num_initializers": 1079,
+   "initializer_bytes": 1346232,
+   "unique_initializer_bytes": 1345016,
+   "duplicated_initializer_bytes": 1216,
+   "initializers_used_by_several_nodes": 782,
+   "max_uses_of_one_initializer": 2,
+   "rms_error_vs_fp32_one_sample": 0.045370131731033325
+  },
+  "a16/encoder_k6.onnx": {
+   "file_bytes": 1861854,
+   "num_nodes": 1272,
+   "ops": {
+    "Add": 81,
+    "Concat": 2,
+    "Constant": 58,
+    "Conv": 70,
+    "DequantizeLinear": 490,
+    "Div": 21,
+    "Identity": 8,
+    "Mul": 62,
+    "QuantizeLinear": 391,
+    "ReduceMean": 44,
+    "Reshape": 1,
+    "Sigmoid": 2,
+    "Sqrt": 21,
+    "Sub": 21
+   },
+   "num_initializers": 1079,
+   "initializer_bytes": 1347203,
+   "unique_initializer_bytes": 1345798,
+   "duplicated_initializer_bytes": 1405,
+   "initializers_used_by_several_nodes": 782,
+   "max_uses_of_one_initializer": 2,
+   "rms_error_vs_fp32_one_sample": 0.008023272268474102
+  },
+  "fp32/decoder_k1.onnx": {
+   "file_bytes": 5058561,
+   "num_nodes": 132,
+   "ops": {
+    "Add": 21,
+    "Clip": 1,
+    "Concat": 2,
+    "Constant": 15,
+    "Conv": 23,
+    "ConvTranspose": 2,
+    "Div": 6,
+    "Identity": 8,
+    "Mul": 17,
+    "ReduceMean": 14,
+    "Relu": 8,
+    "Reshape": 1,
+    "Sigmoid": 2,
+    "Sqrt": 6,
+    "Sub": 6
+   },
+   "num_initializers": 54,
+   "initializer_bytes": 5027244,
+   "unique_initializer_bytes": 5027244,
+   "duplicated_initializer_bytes": 0,
+   "initializers_used_by_several_nodes": 4,
+   "max_uses_of_one_initializer": 3
+  },
+  "a8/decoder_k1.onnx": {
+   "file_bytes": 1428834,
+   "num_nodes": 423,
+   "ops": {
+    "Add": 21,
+    "Concat": 2,
+    "Constant": 15,
+    "Conv": 23,
+    "ConvTranspose": 2,
+    "DequantizeLinear": 177,
+    "Div": 6,
+    "Identity": 8,
+    "Mul": 17,
+    "QuantizeLinear": 123,
+    "ReduceMean": 14,
+    "Reshape": 1,
+    "Sigmoid": 2,
+    "Sqrt": 6,
+    "Sub": 6
+   },
+   "num_initializers": 408,
+   "initializer_bytes": 1275168,
+   "unique_initializer_bytes": 1274782,
+   "duplicated_initializer_bytes": 386,
+   "initializers_used_by_several_nodes": 246,
+   "max_uses_of_one_initializer": 2,
+   "rms_error_vs_fp32_one_sample": 0.010409723035991192
+  },
+  "a16/decoder_k1.onnx": {
+   "file_bytes": 1434024,
+   "num_nodes": 423,
+   "ops": {
+    "Add": 21,
+    "Concat": 2,
+    "Constant": 15,
+    "Conv": 23,
+    "ConvTranspose": 2,
+    "DequantizeLinear": 177,
+    "Div": 6,
+    "Identity": 8,
+    "Mul": 17,
+    "QuantizeLinear": 123,
+    "ReduceMean": 14,
+    "Reshape": 1,
+    "Sigmoid": 2,
+    "Sqrt": 6,
+    "Sub": 6
+   },
+   "num_initializers": 408,
+   "initializer_bytes": 1275871,
+   "unique_initializer_bytes": 1275418,
+   "duplicated_initializer_bytes": 453,
+   "initializers_used_by_several_nodes": 246,
+   "max_uses_of_one_initializer": 2,
+   "rms_error_vs_fp32_one_sample": 0.002541320165619254
+  },
+  "fp32/decoder_k6.onnx": {
+   "file_bytes": 5139064,
+   "num_nodes": 417,
+   "ops": {
+    "Add": 81,
+    "Clip": 1,
+    "Concat": 2,
+    "Constant": 60,
+    "Conv": 68,
+    "ConvTranspose": 2,
+    "Div": 21,
+    "Identity": 8,
+    "Mul": 62,
+    "ReduceMean": 44,
+    "Relu": 23,
+    "Reshape": 1,
+    "Sigmoid": 2,
+    "Sqrt": 21,
+    "Sub": 21
+   },
+   "num_initializers": 54,
+   "initializer_bytes": 5027244,
+   "unique_initializer_bytes": 5027244,
+   "duplicated_initializer_bytes": 0,
+   "initializers_used_by_several_nodes": 22,
+   "max_uses_of_one_initializer": 8
+  },
+  "a8/decoder_k6.onnx": {
+   "file_bytes": 1849155,
+   "num_nodes": 1278,
+   "ops": {
+    "Add": 81,
+    "Concat": 2,
+    "Constant": 60,
+    "Conv": 68,
+    "ConvTranspose": 2,
+    "DequantizeLinear": 492,
+    "Div": 21,
+    "Identity": 8,
+    "Mul": 62,
+    "QuantizeLinear": 393,
+    "ReduceMean": 44,
+    "Reshape": 1,
+    "Sigmoid": 2,
+    "Sqrt": 21,
+    "Sub": 21
+   },
+   "num_initializers": 1083,
+   "initializer_bytes": 1345998,
+   "unique_initializer_bytes": 1344763,
+   "duplicated_initializer_bytes": 1235,
+   "initializers_used_by_several_nodes": 786,
+   "max_uses_of_one_initializer": 2,
+   "rms_error_vs_fp32_one_sample": 0.020408445969223976
+  },
+  "a16/decoder_k6.onnx": {
+   "file_bytes": 1863304,
+   "num_nodes": 1278,
+   "ops": {
+    "Add": 81,
+    "Concat": 2,
+    "Constant": 60,
+    "Conv": 68,
+    "ConvTranspose": 2,
+    "DequantizeLinear": 492,
+    "Div": 21,
+    "Identity": 8,
+    "Mul": 62,
+    "QuantizeLinear": 393,
+    "ReduceMean": 44,
+    "Reshape": 1,
+    "Sigmoid": 2,
+    "Sqrt": 21,
+    "Sub": 21
+   },
+   "num_initializers": 1083,
+   "initializer_bytes": 1346971,
+   "unique_initializer_bytes": 1345558,
+   "duplicated_initializer_bytes": 1413,
+   "initializers_used_by_several_nodes": 786,
+   "max_uses_of_one_initializer": 2,
+   "rms_error_vs_fp32_one_sample": 0.004438825882971287
+  }
+ },
+ "sharing_across_k": {
+  "fp32/encoder": {
+   "k_values": [
+    1,
+    6
+   ],
+   "bytes_common_to_all_k": 5027488,
+   "unique_bytes_per_k": {
+    "1": 5027488,
+    "6": 5027488
+   },
+   "bytes_if_stored_separately": 10054976,
+   "bytes_if_deduplicated_across_k": 5027488
+  },
+  "a8/encoder": {
+   "k_values": [
+    1,
+    6
+   ],
+   "bytes_common_to_all_k": 1273869,
+   "unique_bytes_per_k": {
+    "1": 1275030,
+    "6": 1345016
+   },
+   "bytes_if_stored_separately": 2620046,
+   "bytes_if_deduplicated_across_k": 1346177
+  },
+  "a16/encoder": {
+   "k_values": [
+    1,
+    6
+   ],
+   "bytes_common_to_all_k": 1274496,
+   "unique_bytes_per_k": {
+    "1": 1275662,
+    "6": 1345798
+   },
+   "bytes_if_stored_separately": 2621460,
+   "bytes_if_deduplicated_across_k": 1346964
+  },
+  "fp32/decoder": {
+   "k_values": [
+    1,
+    6
+   ],
+   "bytes_common_to_all_k": 5027244,
+   "unique_bytes_per_k": {
+    "1": 5027244,
+    "6": 5027244
+   },
+   "bytes_if_stored_separately": 10054488,
+   "bytes_if_deduplicated_across_k": 5027244
+  },
+  "a8/decoder": {
+   "k_values": [
+    1,
+    6
+   ],
+   "bytes_common_to_all_k": 1266825,
+   "unique_bytes_per_k": {
+    "1": 1274782,
+    "6": 1344763
+   },
+   "bytes_if_stored_separately": 2619545,
+   "bytes_if_deduplicated_across_k": 1352720
+  },
+  "a16/decoder": {
+   "k_values": [
+    1,
+    6
+   ],
+   "bytes_common_to_all_k": 1267424,
+   "unique_bytes_per_k": {
+    "1": 1275418,
+    "6": 1345558
+   },
+   "bytes_if_stored_separately": 2620976,
+   "bytes_if_deduplicated_across_k": 1353552
+  }
+ }
+}

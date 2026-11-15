@@ -1,27 +1,92 @@
-# sem-base
+# RecurrentJSCC
 
-Train the DeepJSCC image transmission model with Python 3.12 and [uv](https://docs.astral.sh/uv/).
+Image transmission with a weight-shared recurrent core: one ConvNeXt core applied K times in the encoder
+and K times in the decoder (K chosen independently on each side), FiLM depth conditioning, and static
+unrolling for NPU export. `DeepJSCC_lite` from the `separ` branch is kept as a regression baseline.
+The full specification and milestones are in `CLAUDE.md`.
+
+## Setup
+
+Python 3.12 with [uv](https://docs.astral.sh/uv/). PyTorch uses the cu128 index; `onnxruntime` is pinned to
+1.23.x to match the board.
 
 ```sh
 uv sync
-uv run python train.py --config_file configs/default.yaml
+uv run pytest -q
+uv run ruff check . && uv run ruff format --check .
 ```
 
-The project uses PyTorch 2.9 and CUDA 12.8 wheels on Linux and Windows. A compatible NVIDIA driver is needed for GPU training; the visible GPU with the most free memory is selected. Use `--use_cpu` for CPU training, or set `CUDA_VISIBLE_DEVICES` to limit GPU selection. See the full options with `uv run python train.py --config_file configs/default.yaml --help`.
-
-Set `dataset.train_dataset` and `dataset.valid_dataset` in the configuration to image folders, such as `~/datasets/ImageNet8000` and `~/datasets/Kodak`. Images are discovered recursively, so filenames and image counts need not follow a fixed pattern. Supported extensions are JPEG, PNG, BMP, WebP, and TIFF. Both training and validation use random 256×256 crops after resizing; training also adds a small amount of noise. Each image is used once per epoch. Training output and checkpoints are written under `logs/BASELINE` by default. Configuration values can be overridden on the command line, for example `--dataset.train_dataset ~/datasets/ImageNet8000 --dataset.num_workers 0`.
-
-The `DeepJSCC_lite` configuration uses separate `DeepJSCCEncoder` and `DeepJSCCDecoder` modules. The encoder takes an RGB tensor and an operating spp and returns real-valued symbol channels in `(batch, channels, symbol_height, symbol_width)` order. Each adjacent pair of channels represents the real and imaginary parts of a complex symbol. The spatial dimensions are the image dimensions divided by 16 and rounded up. The decoder takes the received symbol tensor and the original height and width, restores any unused channels internally, and returns the reconstructed image at its original dimensions. Both modules use the same maximum spp and dimension settings. Training simulates an AWGN channel between them; the channel is not part of either module.
-
-For each training batch, SNR in dB is sampled uniformly between `model.min_SNRdB` and `model.max_SNRdB`, and spp is sampled uniformly between `model.min_spp` and `model.spp`. The sampled spp is rounded to the nearest available complex-symbol channel count. Validation uses the midpoint SNR and maximum spp.
-
-Export the best checkpoint from an experiment directory and run an image through both ONNX models with a simulated channel:
+## Train, evaluate, export
 
 ```sh
-uv run export_onnx.py logs/BASELINE
-uv run run_inference.py BASELINE_encoder.onnx BASELINE_decoder.onnx input.png --snr 10 --output reconstruction.png
+uv run python train.py --config_file configs/recurrent/joint_rel.yaml
+uv run python evaluate.py logs/joint_rel --iters all                       # results/sim/joint_rel.json
+uv run python evaluate.py logs/joint_rel --iters 3 5 --out results/sim/joint_rel_heldout.json
+uv run python export_onnx.py logs/joint_rel                                # dynamic axes, PC inference
+uv run python export_onnx.py logs/joint_rel --static 256 256               # fixed shapes, NPU
+uv run python run_inference.py artifacts/joint_rel/onnx/encoder_k2_dyn.onnx \
+    artifacts/joint_rel/onnx/decoder_k4_dyn.onnx input.png --snr 10
+uv run python tools/plots.py                                               # results/figures, results/tables
 ```
 
-The exporter writes separate `<experiment>_encoder.onnx` and `<experiment>_decoder.onnx` files and preserves paths nested below `logs/`. The encoder takes float32 `input_image` of shape `(batch, 3, height, width)`, scaled to [0, 1], and outputs float32 `symbols`. The decoder takes float32 `received` with the same layout, plus scalar int64 `height` and `width`, and outputs `reconstructed_image`. Send the original image height and width as side information with the symbols. Image and symbol spatial dimensions and batch size are dynamic; the decoder also accepts different valid even channel counts up to its configured maximum.
+Any config value can be overridden on the command line (`--model.dim 96`, `--train.iters "[2]"`).
+`--train.max_steps N` stops each epoch after N steps for smoke runs. Experiments are written to
+`logs/<experiment_name>/` (`config.yaml` as a plain dict with the git revision, `logging.log`, TensorBoard,
+`latest_ckpt_ep*`, `best_ckpt_ep*`, `weights/Epoch_*`). Resume with `--logging.pretrain_ckpt <ckpt>`.
 
-The ONNX encoder's spp is fixed at export time. It defaults to the configured maximum and can be changed with `--spp`; the decoder works with any supported channel count. The example inference script uses simulated AWGN, controlled by `--snr`, between the two ONNX sessions. A real transmitter and receiver should use their physical channel instead. Existing combined ONNX files must be re-exported as separate models.
+| config | what it trains |
+|---|---|
+| `recurrent/joint_{rel,abs,none}` | shared core, K sampled from {1, 2, 4, 6} per minibatch, FiLM relative / absolute / none |
+| `recurrent/fixed_k{1,2,4,6}_rel` | shared core, a single training depth (`train.iters: [K]`) |
+| `recurrent/unshared_k{1,2,4,6}` | unshared stack of the same depth (`share_core: false`, `model.iters: [K]`) |
+| `baseline` | DeepJSCC_lite |
+
+## The link
+
+`utils/link.py::run_link` is the only place the pieces meet; nothing below is inside a model graph:
+
+    pad image to the stride -> encoder(image, snr, K) -> keep the first channels for the spp
+    -> per-sample power normalization -> AWGN -> zero-pad channels -> decoder(received, snr, K) -> crop
+
+Symbols are real `(B, C, h, w)` tensors; adjacent channel pairs are I/Q of one complex symbol. At stride 8,
+spp 0.5 is 64 real channels. `snr` is a `(B, 1)` tensor in dB and a graph input after export.
+`bench/chain.py` is the numpy twin of `channel.py` used by the ONNX tools and on the board.
+
+## NPU pipeline (Rubik Pi 3, ONNX Runtime QNN EP)
+
+Server side (this repository):
+
+```sh
+uv run python export_onnx.py logs/joint_rel --static 256 256        # artifacts/joint_rel/onnx
+uv run python tools/make_calib.py artifacts/joint_rel               # calib/ and bench/ inputs
+uv run python tools/quantize.py artifacts/joint_rel                 # qdq/a8, qdq/a16, results/npu/joint_rel/onnx_stats.json
+uv run python tools/make_bundle.py artifacts/joint_rel --name joint_rel   # artifacts/bundles/joint_rel.tar.gz
+uv run python tools/collect_npu.py joint_rel --server-ref           # CPU-EP reference -> results/npu/joint_rel/server_cpu
+```
+
+Toolchain checks without a checkpoint:
+
+```sh
+uv run python tools/m0a_dummy.py && uv run python tools/quantize.py artifacts/m0a_dummy
+uv run python tools/make_bundle.py artifacts/m0a_dummy --name m0a --fp32-on-qnn
+uv run python export_onnx.py configs/recurrent/joint_rel.yaml --random-init --static 256 256 \
+    --enc-iters 1 6 --dec-iters 1 6 --name m0b_bn --override model.norm=batchnorm
+```
+
+Board side. A bundle is self-contained (models, inputs, `bench/`); it needs only numpy and onnxruntime-qnn:
+
+```sh
+tar xzf joint_rel.tar.gz && cd <recurrent-npu-jscc project>
+uv run python <path>/joint_rel/bench/run_all.py            # writes <path>/joint_rel/out/<timestamp>/
+```
+
+`tools/relay.sh <bundle>` does server -> local PC -> board -> run -> results back to `incoming/` in one go
+(see the header of the script for the environment variables). With `BOARD_SSH` and `BOARD_PROJECT` set on
+the server, `tools/make_bundle.py --send` and `tools/collect_npu.py <bundle> --run` do the same directly.
+Either way, `uv run python tools/collect_npu.py <bundle>` parses a results tarball into
+`results/npu/<bundle>/<timestamp>/` (`latency.csv`, `psnr.csv`, `thermal.csv`, `placement.json`, `sysinfo.json`).
+
+`bench/run_all.py` measures, per model: QNN compile time and latency (median/p95), reload time from the
+context cache, peak RSS, context binary size, a run with CPU fallback disabled, node placement (verbose log
+and ORT profile), CPU-EP latency, and thermal state around every step; then PSNR for every
+(encoder K, decoder K) pair with fixed channel noise, saving raw outputs as `.npy`.

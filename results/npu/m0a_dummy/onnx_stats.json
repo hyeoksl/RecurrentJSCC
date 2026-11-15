@@ -1,0 +1,54 @@
+{
+ "name": "m0a_dummy",
+ "onnxruntime": "1.23.2",
+ "per_channel": false,
+ "models": {
+  "fp32/dummy.onnx": {
+   "file_bytes": 12433,
+   "num_nodes": 5,
+   "ops": {
+    "Conv": 3,
+    "Relu": 2
+   },
+   "num_initializers": 6,
+   "initializer_bytes": 11616,
+   "unique_initializer_bytes": 11616,
+   "duplicated_initializer_bytes": 0,
+   "initializers_used_by_several_nodes": 0,
+   "max_uses_of_one_initializer": 1
+  },
+  "a8/dummy.onnx": {
+   "file_bytes": 6806,
+   "num_nodes": 17,
+   "ops": {
+    "Conv": 3,
+    "DequantizeLinear": 10,
+    "QuantizeLinear": 4
+   },
+   "num_initializers": 26,
+   "initializer_bytes": 3083,
+   "unique_initializer_bytes": 3072,
+   "duplicated_initializer_bytes": 11,
+   "initializers_used_by_several_nodes": 8,
+   "max_uses_of_one_initializer": 2,
+   "rms_error_vs_fp32_one_sample": 0.0008426139247603714
+  },
+  "a16/dummy.onnx": {
+   "file_bytes": 7041,
+   "num_nodes": 17,
+   "ops": {
+    "Conv": 3,
+    "DequantizeLinear": 10,
+    "QuantizeLinear": 4
+   },
+   "num_initializers": 26,
+   "initializer_bytes": 3087,
+   "unique_initializer_bytes": 3074,
+   "duplicated_initializer_bytes": 13,
+   "initializers_used_by_several_nodes": 8,
+   "max_uses_of_one_initializer": 2,
+   "rms_error_vs_fp32_one_sample": 0.0003844137827400118
+  }
+ },
+ "sharing_across_k": {}
+}
